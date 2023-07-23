@@ -14,5 +14,7 @@ mkdir -p ~/.local/share/pop-launcher/plugins/
 git clone <link> ~/.local/share/pop-launcher/plugins/
 ```
 
+## Contributing
+
 - [ ] Interruptions to cancel while typing the search.
-- [ ] Grep in other files types.
+- [ ] make plugin work with other filetypes.
