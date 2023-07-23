@@ -1,0 +1,78 @@
+#!/usr/bin/env python3
+
+import json
+import os
+import sys
+
+class Plugin():
+    def __init__(self):
+        self.matches = []
+
+    def activate(self, index):
+        if not self.matches:
+            return
+        
+        command = f"evince -i {self.matches[index]['page']} '{self.matches[index]['path']}'"
+        os.popen(command)
+
+        sys.stdout.write('"Close"\n')
+        sys.stdout.flush()
+
+    def search(self, query):
+        query = query.split(" ", 1)[1]
+        self.matches = []
+        self.find_matches_files("/home/wookyz/Documentos", query)
+
+        for index, match in enumerate(self.matches):
+            filename = os.path.basename(match['path'])
+            description = f"Página: {match['page']} - {match['match']}"
+            sys.stdout.write(json.dumps({
+                'Append': {
+                    'id': index,
+                    'name': filename,
+                    'description': description,
+                    'keywords': None,
+                    'icon': {
+                        'Name': 'application-pdf'
+                    },
+                    'exec': None,
+                    'window': None
+                }
+            }))
+            sys.stdout.write('\n')
+
+        sys.stdout.write('"Finished"\n')
+        sys.stdout.flush()
+
+
+    def find_matches_files(self, dir_path, target_word):
+        command = f"pdfgrep -i --cache -rnH -m 1 {target_word} '{dir_path}'"
+        result = os.popen(command).read()
+        if result:
+            result = result.strip().split('\n')
+            for match in result:
+                match = match.split(':')
+                match_dict = {
+                    'path': match[0],
+                    'page': match[1],
+                    'match': match[2].strip()
+                }
+                self.matches.append(match_dict)
+
+
+def main():
+    app = Plugin()
+
+    for line in sys.stdin:
+        try:
+            request = json.loads(line)
+            if 'Search' in request:
+                app.search(request['Search'])
+            elif 'Activate' in request:
+                app.activate(request['Activate'])
+        except json.decoder.JSONDecodeError:
+            pass
+
+
+if __name__ == '__main__':
+    main()

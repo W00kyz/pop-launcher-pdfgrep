@@ -1,0 +1,12 @@
+(
+    name: "Grep File",
+    description: "Syntax: grep <pattern>\nExample: grep word",
+    query: (
+        regex: "^(grep )+",
+        help: "grep ",
+        isolate: true,
+        persistent: true,
+    ),
+    bin: (path: "pdfgrep"),
+    icon: Name("system-file-manager"),
+)
