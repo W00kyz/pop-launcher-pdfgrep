@@ -21,7 +21,7 @@ class Plugin():
     def search(self, query):
         query = query.split(" ", 1)[1]
         self.matches = []
-        self.find_matches_files("/home/wookyz/Documentos", query)
+        self.find_matches_files(os.path.expanduser("~"), query)
 
         for index, match in enumerate(self.matches):
             filename = os.path.basename(match['path'])
